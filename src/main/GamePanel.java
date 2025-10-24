@@ -8,6 +8,7 @@ import java.awt.Graphics2D;
 import javax.swing.JPanel;
 
 import entity.Player;
+import object.Interactable;
 import tile.TileManager;
 
 public class GamePanel extends JPanel implements Runnable{
@@ -32,13 +33,15 @@ public class GamePanel extends JPanel implements Runnable{
 	KeyboardInput key = new KeyboardInput();
 	Thread gameThread; //game clock
 	public CollisionCheck cd = new CollisionCheck(this); 
+	public AssetSetup AS = new AssetSetup(this);
 	public Player player = new Player(this, key);
+	public Interactable obj[] = new Interactable[10];
 	
 	/* WORLD SETTINGS */
 	public final int maxWorldCol = 50;
 	public final int maxWorldRow = 50;
 	public final int worldWidth = tileSize * maxWorldCol;
-	public final int worldheight = tileSize * maxWorldRow;
+	public final int worldHeight = tileSize * maxWorldRow;
 	
 	
 	/* Game Panel Constructor */
@@ -52,6 +55,10 @@ public class GamePanel extends JPanel implements Runnable{
 		
 	}
 	
+	public void objectLoad() {
+		
+		AS.setObject();
+	}
 	
 	public void startGameThread() {
 		
@@ -153,6 +160,12 @@ public class GamePanel extends JPanel implements Runnable{
 		Graphics2D g2 = (Graphics2D)g;
 		
 		TM.draw(g2);
+		
+		for(int ctr = 0; ctr < obj.length; ctr++) {
+			if (obj[ctr] != null) {
+				obj[ctr].draw(g2, this);
+			}
+		}
 		
 		player.draw(g2);
 		
