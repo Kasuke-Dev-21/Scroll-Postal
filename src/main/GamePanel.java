@@ -29,13 +29,20 @@ public class GamePanel extends JPanel implements Runnable{
 	//FPS variable
 	int fps = 60;
 	
+	//System Setup
 	TileManager TM = new TileManager(this);
 	KeyboardInput key = new KeyboardInput();
-	Thread gameThread; //game clock
 	public CollisionCheck cd = new CollisionCheck(this); 
 	public AssetSetup AS = new AssetSetup(this);
+	public GUI ui = new GUI(this);
+	Sound bgm = new Sound();
+	Sound sfx = new Sound();
+	Thread gameThread; //game clock
+	
+	//Entity and object
 	public Player player = new Player(this, key);
 	public Interactable obj[] = new Interactable[10];
+	
 	
 	/* WORLD SETTINGS */
 	public final int maxWorldCol = 50;
@@ -55,9 +62,10 @@ public class GamePanel extends JPanel implements Runnable{
 		
 	}
 	
-	public void objectLoad() {
+	public void gameLoad() {
 		
 		AS.setObject();
+		playMusic(0);
 	}
 	
 	public void startGameThread() {
@@ -159,18 +167,39 @@ public class GamePanel extends JPanel implements Runnable{
 		//2D Graphics
 		Graphics2D g2 = (Graphics2D)g;
 		
+		//Tile
 		TM.draw(g2);
 		
+		//Object
 		for(int ctr = 0; ctr < obj.length; ctr++) {
 			if (obj[ctr] != null) {
 				obj[ctr].draw(g2, this);
 			}
 		}
 		
+		//Player
 		player.draw(g2);
+		
+		//GUI
+		ui.draw(g2);
 		
 		g2.dispose();
 		
 	}
 	
+	public void playMusic(int x) {
+		bgm.setFile(x);
+		bgm.play();
+		bgm.loop();
+	}
+	
+	
+	public void stopMusic() {
+		bgm.stop();
+	}
+	
+	public void playSFX(int x) {
+		sfx.setFile(x);
+		sfx.play();
+	}
 }

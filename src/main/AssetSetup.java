@@ -1,5 +1,6 @@
 package main;
 
+import object.ObjectBoots;
 import object.ObjectChest;
 import object.ObjectDoor;
 import object.ObjectKey;
@@ -41,5 +42,10 @@ public class AssetSetup {
 		gp.obj[6] = new ObjectChest();
 		gp.obj[6].worldX = 10 * gp.tileSize;
 		gp.obj[6].worldY = 8 * gp.tileSize;
+		
+		gp.obj[7] = new ObjectBoots();
+		gp.obj[7].worldX = 37 * gp.tileSize;
+		gp.obj[7].worldY = 42 * gp.tileSize;
+		
 	}
 }
