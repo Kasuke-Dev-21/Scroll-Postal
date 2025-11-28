@@ -8,8 +8,7 @@ import java.util.ArrayList;
 
 import javax.swing.JPanel;
 
-import entity.Building;
-import entity.NPC;
+
 import entity.Player;
 import object.Interactable;
 import tile.TileManager;
@@ -38,8 +37,6 @@ public class GamePanel extends JPanel implements Runnable{
 	public CollisionCheck cd = new CollisionCheck(this); 
 	public AssetSetup AS = new AssetSetup(this);
 	public GUI ui = new GUI(this);
-	public EntityLoader loader = new EntityLoader(this);
-	public InteractManager im = new InteractManager(this);
 	Sound bgm = new Sound();
 	Sound sfx = new Sound();
 	Thread gameThread; //game clock
@@ -47,14 +44,6 @@ public class GamePanel extends JPanel implements Runnable{
 	//Entity and object
 	public Player player = new Player(this, key);
 	public Interactable obj[] = new Interactable[10];
-	
-	public ArrayList<NPC> npcList = new ArrayList<>();
-	public ArrayList<Building> buildingList = new ArrayList<>();
-
-	
-	public NPC[] npcs = new NPC[10];
-	public Building[] buildings = new Building[5];
-	
 	
 	/* WORLD SETTINGS */
 	public final int maxWorldCol = 50;
@@ -78,7 +67,6 @@ public class GamePanel extends JPanel implements Runnable{
 		
 		AS.setObject();
 		playMusic(0);
-		loader.loadEntities(); // <-- load NPCs and buildings
 
 	}
 	
@@ -168,36 +156,14 @@ public class GamePanel extends JPanel implements Runnable{
 		}
 	}
 	
-	public void setupEntities() {
-	    // NPCs
-	    npcs[0] = new NPC(this, tileSize * 5, tileSize * 5);
-	    npcs[1] = new NPC(this, tileSize * 10, tileSize * 8);
-
-	    // Buildings
-	    buildings[0] = new Building(this, tileSize * 2, tileSize * 2, tileSize * 2, tileSize * 2, "Post Office");
-	}
-
-	
 	public void update() {
 		
 		//Player movement logic
 		player.update();
 		
-	    // Handle interactions
-		im.handleInteractions();
 
 		// reset flag so it only triggers once per press
 		key.interactTyped = false;
-		
-		// Update NPCs
-		for(NPC npc : npcList) {
-		    npc.update();
-		}
-
-		// Update Buildings if needed
-		for(Building b : buildingList) {
-		    b.update();
-		}
 	}
 	
 	public void paintComponent(Graphics g) {
@@ -207,18 +173,12 @@ public class GamePanel extends JPanel implements Runnable{
 		//2D Graphics
 		Graphics2D g2 = (Graphics2D)g;
 		
+		//Debug
+		long drawStart = 0;
+		drawStart = System.nanoTime();
+		
 		//Tile
 		TM.draw(g2);
-		
-		// Draw NPCs
-		for(NPC npc : npcList) {
-		    npc.draw(g2, this);
-		}
-
-		// Draw Buildings
-		for(Building b : buildingList) {
-		    b.draw(this);
-		}
 		
 		//Object
 		for(int ctr = 0; ctr < obj.length; ctr++) {
