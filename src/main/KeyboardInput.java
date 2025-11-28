@@ -6,10 +6,15 @@ import java.awt.event.KeyListener;
 public class KeyboardInput implements KeyListener{
 	
 	public boolean upPressed, downPressed, leftPressed, rightPressed;
+	public boolean interactTyped;
 
 	@Override
 	public void keyTyped(KeyEvent e) {
-		
+	    char keyChar = e.getKeyChar();
+
+	    if (keyChar == 'e' || keyChar == 'E') { // E is the interact key
+	        interactTyped = true;
+	    }
 	}
 
 	@Override

@@ -17,6 +17,8 @@ public class Player extends Entity{
 	public final int screenX;
 	public final int screenY;
 	public int hasKey = 0;
+	public boolean hasMail = false; // new field
+	public int score = 0;           // track score
 	
 	public Player(GamePanel gp, KeyboardInput key) {
 		
@@ -143,6 +145,13 @@ public class Player extends Entity{
 				gp.obj[ndx] = null;
 				gp.ui.showMessage("Speed up!");
 				break;
+			case "mail":
+			    if(!hasMail){
+			        hasMail = true;
+			        gp.obj[ndx] = null;
+			        gp.ui.showMessage("Picked up mail!");
+			    }
+			    break;
 			}
 		}
 	}
