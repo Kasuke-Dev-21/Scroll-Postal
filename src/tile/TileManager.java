@@ -1,6 +1,7 @@
 package tile;
 
 import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -9,6 +10,7 @@ import java.io.InputStreamReader;
 import javax.imageio.ImageIO;
 
 import main.GamePanel;
+import main.Util;
 
 public class TileManager {
 
@@ -33,25 +35,35 @@ public class TileManager {
 	}
 	
 	public void getTileImage() {
-		
-		try {
-			for(int x = 0; x < 6; x++) {
-				tile[x] = new Tile();
-				tile[x].image = ImageIO.read(getClass().getResourceAsStream("/tiles/" + files[x]));
-				switch(x) {
-				case 1:
-				case 2:
-				case 4:
-					tile[x].collision = true; break;
-				}
+		for(int x = 0; x < 6; x++) {
+			boolean collision = false;
+
+			switch(x) {
+			case 1:
+			case 2:
+			case 4:
+				tile[x].collision = true; break;
 			}
-			
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+
+			setup(x, files[x], collision);
+		}		
 		
 	}
 	
+	public void setup(int index, String imagePath, boolean collision){
+		Util tool = new Util();
+		
+		try{
+			tile[index] = new Tile();
+			tile[index].image = ImageIO.read(getClass().getResourceAsStream("/tiles/" + imagePath));
+			tile[index].image = tool.scaleImage(tile[index].image, gp.tileSize, gp.tileSize);
+			tile[index].collision = collision;
+		} catch(IOException e){
+			e.printStackTrace();
+		}
+
+	}
+
 	public void loadMap(String map) {
 		
 		try {
@@ -100,7 +112,7 @@ public class TileManager {
 						worldY + gp.tileSize > gp.player.worldY - gp.player.screenY &&
 						worldY - gp.tileSize < gp.player.worldY + gp.player.screenY) {
 					
-					g2.drawImage(tile[tileNum].image, screenX, screenY, gp.tileSize, gp.tileSize, null);
+					g2.drawImage(tile[tileNum].image, screenX, screenY, null);
 					
 				}
 				

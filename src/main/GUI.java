@@ -20,7 +20,7 @@ public class GUI {
 	public GUI(GamePanel gp) {
 		this.gp = gp;
 		iconFont = new Font("Cambria", Font.PLAIN, 40);
-		ObjectKey key = new ObjectKey();
+		ObjectKey key = new ObjectKey(gp);
 		keyIcon = key.image;
 		
 	}

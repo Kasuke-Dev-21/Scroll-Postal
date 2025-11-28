@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.util.ArrayList;
 
 import javax.swing.JPanel;
 
@@ -175,7 +174,9 @@ public class GamePanel extends JPanel implements Runnable{
 		
 		//Debug
 		long drawStart = 0;
-		drawStart = System.nanoTime();
+		if(key.checkRender == true){
+			drawStart = System.nanoTime();
+		}
 		
 		//Tile
 		TM.draw(g2);
@@ -193,6 +194,14 @@ public class GamePanel extends JPanel implements Runnable{
 		//GUI
 		ui.draw(g2);
 		
+		//Debug
+		if(key.checkRender == true){
+			long drawEnd = System.nanoTime();
+			long passed = drawEnd - drawStart;
+			g2.setColor(Color.white);
+			g2.drawString("Draw Time: " + passed, 10, 400);
+			System.out.println("Draw Time: " + passed);
+		}
 		g2.dispose();
 		
 	}

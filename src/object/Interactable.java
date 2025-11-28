@@ -5,6 +5,7 @@ import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 
 import main.GamePanel;
+import main.Util;
 
 public class Interactable {
 	
@@ -17,6 +18,9 @@ public class Interactable {
 	public Rectangle hitbox = new Rectangle(0, 0, 48, 48);
 	public int hitboxDefaultX = 0;
 	public int hitboxDefaultY = 0;
+
+	//Debug
+	Util tool = new Util();
 	
 	public void draw(Graphics2D g2, GamePanel gp) {
 		int screenX = worldX - gp.player.worldX + gp.player.screenX;

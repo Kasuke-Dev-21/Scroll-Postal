@@ -7,14 +7,13 @@ public class KeyboardInput implements KeyListener{
 	
 	public boolean upPressed, downPressed, leftPressed, rightPressed;
 	public boolean interactTyped;
+	
+	//Debug
+	public boolean checkRender = false;
+	
 
 	@Override
 	public void keyTyped(KeyEvent e) {
-	    char keyChar = e.getKeyChar();
-
-	    if (keyChar == 'e' || keyChar == 'E') { // E is the interact key
-	        interactTyped = true;
-	    }
 	}
 
 	@Override
@@ -34,7 +33,16 @@ public class KeyboardInput implements KeyListener{
 		if(code == KeyEvent.VK_D) {
 			rightPressed = true;
 		}
-		
+	    if(code == KeyEvent.VK_E) { // E is the interact key
+	        interactTyped = true;
+	    }
+		if(code == KeyEvent.VK_T){
+			if(checkRender == false){
+				checkRender = true;
+			} else if(checkRender == true){
+				checkRender = false;
+			}
+		}
 		
 	}
 

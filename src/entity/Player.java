@@ -9,6 +9,7 @@ import javax.imageio.ImageIO;
 
 import main.GamePanel;
 import main.KeyboardInput;
+import main.Util;
 
 public class Player extends Entity{
 
@@ -52,21 +53,29 @@ public class Player extends Entity{
 	}
 	
 	public void getImage() {
-		try {
-			
-			up1 = ImageIO.read(getClass().getResourceAsStream("/player/boy_up_1.png"));
-			up2 = ImageIO.read(getClass().getResourceAsStream("/player/boy_up_2.png"));
-			down1 = ImageIO.read(getClass().getResourceAsStream("/player/boy_down_1.png"));
-			down2 = ImageIO.read(getClass().getResourceAsStream("/player/boy_down_2.png"));
-			left1 = ImageIO.read(getClass().getResourceAsStream("/player/boy_left_1.png"));
-			left2 = ImageIO.read(getClass().getResourceAsStream("/player/boy_left_2.png"));
-			right1 = ImageIO.read(getClass().getResourceAsStream("/player/boy_right_1.png"));
-			right2 = ImageIO.read(getClass().getResourceAsStream("/player/boy_right_2.png"));
-			
-		} catch(IOException e) {
+		up1 = setup("boy_up_1.png");
+		up2 = setup("boy_up_2.png");
+		down1 = setup("boy_down_1.png");
+		down2 = setup("boy_down_2.png");
+		left1 = setup("boy_left_1.png");
+		left2 = setup("boy_left_2.png");
+		right1 = setup("boy_right_1.png");
+		right2 = setup("boy_right_2.png");
+	}
+
+	public BufferedImage setup(String imagePath){
+		
+		Util tool = new Util();
+		BufferedImage image = null;
+
+		try{
+			image = ImageIO.read(getClass().getResourceAsStream("/player/" + imagePath));
+			image = tool.scaleImage(image, gp.tileSize, gp.tileSize);
+		} catch(IOException e){
 			e.printStackTrace();
 		}
-		
+
+		return image;
 	}
 	
 	public void update() {
