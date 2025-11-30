@@ -1,10 +1,14 @@
 package main;
 
 import java.awt.Color;
+
 import java.awt.Font;
 import java.awt.FontFormatException;
 import java.awt.Graphics2D;
-import java.awt.RenderingHints;
+
+import java.awt.image.BufferedImage; 
+import javax.imageio.ImageIO; 
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.awt.BasicStroke;
@@ -15,18 +19,25 @@ public class GUI {
 
 	GamePanel gp;
 	Graphics2D g2;
+
+	//Fonts
 	Font pixType, testType;
-	
+	Font contentFont; 
+
+	//Text Content
+	public String helpContent = "";
 	public boolean messageOn = false;
 	public String message = "";
 	int messageLifetime = 0;
 
+	//Menu Select
+	public BufferedImage titleScreenImage;
+	public int commandNum = 0;
+	public int titleWindow = 0;
+
+	//Timer values
 	double playTime = 600;
 	DecimalFormat timeFormat = new DecimalFormat("#0");
-
-	Font contentFont; 
-	
-	public String helpContent = "";
 	
 	public GUI(GamePanel gp) {
 		this.gp = gp;
@@ -36,6 +47,8 @@ public class GUI {
 			pixType = Font.createFont(Font.TRUETYPE_FONT, is);
 			is = getClass().getResourceAsStream("/font/Purisa Bold.ttf");
 			testType = Font.createFont(Font.TRUETYPE_FONT, is);
+
+			titleScreenImage = ImageIO.read(getClass().getResourceAsStream("/screens/title-screen.png"));
 		} catch(FontFormatException e) {
 			e.printStackTrace();
 		} catch(IOException e) {
@@ -70,12 +83,15 @@ public class GUI {
 		g2.setFont(pixType);
 		g2.setColor(Color.white);
 
-		//Timer
-		g2.drawString(timeFormat.format(playTime), gp.tileSize*13, 65);
-
 		//Game State
 		switch(gp.gameState){
+			case GamePanel.titleState:
+				drawTitle();
+				break;
 			case GamePanel.playState:
+				//Timer
+				g2.drawString(String.valueOf(gp.player.score), gp.tileSize*2, 65);
+				g2.drawString(timeFormat.format(playTime), gp.tileSize*13, 65);
 				playTime -= (double)1/60;
 				break;
 			case GamePanel.pauseState:
@@ -86,6 +102,42 @@ public class GUI {
 				break;
 		}
 
+	}
+
+	public void drawTitle(){
+
+		if (titleScreenImage != null) {
+			g2.drawImage(titleScreenImage, 0, 0, gp.screenWidth, gp.screenHeight, null);
+		} else {
+			// Fallback: If image fails to load, use a solid color background
+			g2.setColor(new Color(70, 120, 80));
+			g2.fillRect(0, 0, gp.screenWidth, gp.screenHeight);
+		}
+		/* TITLE STATES */
+		switch(titleWindow){
+		case 0:
+			g2.setColor(new Color(0, 0, 0, 50));
+			g2.fillRect(0, 0, gp.screenWidth, gp.screenHeight);
+			/* MENU */
+			//Start
+			drawMenuOption("START", 9, 0);
+			//Character Customization
+			drawMenuOption("CHANGE CHARACTER", 10, 1);
+			//Exit
+			drawMenuOption("EXIT", 11, 2);
+			break;
+		case 1:
+			g2.setColor(new Color(0, 0, 0, 90));
+			g2.fillRect(0, 0, gp.screenWidth, gp.screenHeight);
+			// Character Select
+			drawTitleText("CHARACTER SELECT", 3, 96);
+			drawMenuOption("Baldy", 7, 0);
+			drawMenuOption("Centurion", 8, 1);
+			drawMenuOption("Scholar", 9, 2);
+			drawMenuOption("Exit", 11, 3);
+
+		}
+		
 	}
 	public void drawPause(){
 
@@ -146,4 +198,42 @@ public class GUI {
 
 		return x;
 	}
+
+	public void drawTitleText(String text, int location, float size){
+		//Title Name
+			g2.setFont(g2.getFont().deriveFont(Font.BOLD, size));
+			int x = centerTextX(text);
+			int y = gp.tileSize * location;
+
+			//Shadow
+			g2.setColor(Color.BLACK);
+			g2.drawString(text, x + 3, y + 5);
+			//Main Color
+			g2.setColor(Color.WHITE);
+			g2.drawString(text, x, y);
+	}
+
+	public void drawMenuOption(String text, int location, int menuNum){
+		float size = 36F;
+		
+		//Start
+		g2.setFont(g2.getFont().deriveFont(Font.BOLD, size));
+		int x = centerTextX(text);
+		int y = gp.tileSize * location;
+		//Shadow
+		g2.setColor(Color.BLACK);
+		g2.drawString(text, x + 3, y + 5);
+		//Main Color
+		g2.setColor(Color.WHITE);
+		g2.drawString(text, x, y);
+		if(commandNum == menuNum){
+			//Shadow
+			g2.setColor(Color.BLACK);
+			g2.drawString("> ", x + 3 - gp.tileSize, y + 2);
+			//Main Color
+			g2.setColor(Color.WHITE);
+			g2.drawString("> ", x - gp.tileSize, y);
+		}
+	}
+
 }

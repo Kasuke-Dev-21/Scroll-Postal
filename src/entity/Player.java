@@ -10,9 +10,12 @@ import main.KeyboardInput;
 
 public class Player extends Entity{
 	KeyboardInput key;
+	private static final String PLAYER_WALK_SHEET_PATH = "player-walk.png"; 
+    private static final String PLAYER_IDLE_SHEET_PATH = "player-idle.png";
 	public final int screenX;
 	public final int screenY;
 	int idleCount = 0;
+	public String orientation = "right";
 
 	public int hasMail = 0;
 	public int hasScroll = 0;
@@ -29,10 +32,10 @@ public class Player extends Entity{
 		screenY = gp.screenHeight/2 - gp.tileSize/2;
 		
 		hitbox = new Rectangle();
-		hitbox.x = 8;
-		hitbox.y = 14;
-		hitbox.width = gp.tileSize - 18;
-		hitbox.height = gp.tileSize - 16;
+		hitbox.x = 20;
+		hitbox.y = 16;
+		hitbox.width = gp.tileSize / 2 - 8;
+		hitbox.height = gp.tileSize - 24;
 		
 		hitboxDefaultX = hitbox.x;
 		hitboxDefaultY = hitbox.y;
@@ -52,32 +55,54 @@ public class Player extends Entity{
 	}
 	
 	public void getImage() {
-		up1 = setup("player", "boy_up_1.png");
-		up2 = setup("player","boy_up_2.png");
-		down1 = setup("player","boy_down_1.png");
-		down2 = setup("player","boy_down_2.png");
-		left1 = setup("player","boy_left_1.png");
-		left2 = setup("player","boy_left_2.png");
-		right1 = setup("player","boy_right_1.png");
-		right2 = setup("player","boy_right_2.png");
+		String dir = "player";
+		//Idle
+		for (int i = 0; i < 8; i++) {
+            // Note: We use PLAYER_IDLE_SHEET_PATH and row 0
+            BufferedImage frame = setupSheet(dir, PLAYER_IDLE_SHEET_PATH, i, 0); 
+            idle.add(frame);
+        }
+		//Walk
+		for (int i = 0; i < 14; i++) {
+            // Note: We use PLAYER_WALK_SHEET_PATH and row 0
+            BufferedImage frame = setupSheet(dir, PLAYER_WALK_SHEET_PATH, i, 0); 
+            down.add(frame);
+        }
+		
+		up = down;
+        left = down;
+        right = down;
+        
+        // Set the initial current sprites to idle
+        currentSprites = idle;
 	}
 	
 	public void update() {
 		
+		boolean isMoving = key.upPressed || key.downPressed || key.leftPressed || key.rightPressed;
+
 		//Plays only if key is pressed
-		if(key.upPressed == true || key.downPressed == true || 
-				key.leftPressed == true || key.rightPressed == true) {
+		if(isMoving) {
+
+			if (key.upPressed) {
+                direction = "up";
+            } else if (key.downPressed) {
+                direction = "down";
+            } else if (key.leftPressed) {
+                direction = "left";
+				orientation = "left";
+            } else if (key.rightPressed) {
+                direction = "right";
+				orientation = "right";
+            }
 			
 			//Player movement logic
-			if(key.upPressed == true) {
-				direction = "up";
-			} else if(key.downPressed == true) {
-				direction = "down";
-			} else if(key.leftPressed == true) {
-				direction  ="left";
-			} else if(key.rightPressed == true) {
-				direction = "right";
-			}
+			if (currentSprites != down) {
+                currentSprites = down;
+                animationSpeed = 2;
+                spriteIndex = 0; // Reset animation index
+            }
+			
 			
 			//Collision detection
 			collisionOn = false;
@@ -97,24 +122,15 @@ public class Player extends Entity{
 				}
 			}
 			
-			//Animation loop
-			spriteCounter++;
-			if(spriteCounter > 12) {
-				switch(spriteNum) {
-				case 1:
-					spriteNum = 2; break;
-				case 2:
-					spriteNum = 1; break;
-				}
-				spriteCounter = 0;
-			}
+			super.update();
 		
 		} else {
-			idleCount++;
-			if(idleCount == 20){
-				spriteNum = 1;
-				idleCount = 0;
-			}
+			if (currentSprites != idle) {
+                currentSprites = idle;
+                animationSpeed = 5; // Slower animation speed for idle
+                spriteIndex = 0; // Reset animation index
+            }
+			super.update();
 		}
 		
 	}
@@ -145,38 +161,37 @@ public class Player extends Entity{
 	public void draw(Graphics2D g2) {
 		
 		BufferedImage image = null;
-		
-		switch(direction) {
-		case "up":
-			switch(spriteNum) {
-			case 1: image = up1; break;
-			case 2: image = up2; break;
-			}
-			break;
-		case "down":
-			switch(spriteNum) {
-			case 1: image = down1; break;
-			case 2: image = down2; break;
-			}
-			break;
-		case "left":
-			switch(spriteNum) {
-			case 1: image = left1; break;
-			case 2: image = left2; break;
-			}
-			break;
-		case "right":
-			switch(spriteNum) {
-			case 1: image = right1; break;
-			case 2: image = right2; break;
-			}
-			break;
+        if (!currentSprites.isEmpty()) {
+            image = currentSprites.get(spriteIndex); // Get the currently indexed frame
+        }
+
+		// Define the source coordinates (the whole image)
+        int sourceX1 = 0;
+        int sourceY1 = 0;
+        int sourceX2 = gp.tileSize;
+        int sourceY2 = gp.tileSize;
+        
+        // Define the destination coordinates (screen location and size)
+        int destX1 = screenX;
+        int destY1 = screenY;
+        int destX2 = screenX + gp.tileSize;
+        int destY2 = screenY + gp.tileSize;
+
+		if (orientation.equals("left")) {
+            destX1 = screenX + gp.tileSize;
+            destX2 = screenX;
+        }
+		if (image != null) {
+            g2.drawImage(image, destX1, destY1, destX2, destY2, sourceX1, sourceY1, sourceX2, sourceY2, null);
+        }
+
+		if(key.checkRender == true){
+			g2.setColor(Color.red);
+			g2.drawRect(screenX + hitbox.x, screenY + hitbox.y, hitbox.width, hitbox.height);
 		}
-		
-		g2.drawImage(image, screenX, screenY, null);
-		g2.setColor(Color.red);
-		g2.drawRect(screenX + hitbox.x, screenY + hitbox.y, hitbox.width, hitbox.height);
 	}
+
+
 
 	public void interact(int ndx){
 		if(ndx != -1) {

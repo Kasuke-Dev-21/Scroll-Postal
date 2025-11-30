@@ -25,6 +25,58 @@ public class KeyboardInput implements KeyListener{
 	public void keyPressed(KeyEvent e) {
 		
 		int code = e.getKeyCode();
+
+		if(gp.gameState == GamePanel.titleState){
+			int maxOptions;
+			switch(gp.ui.titleWindow){
+			case 0:
+				maxOptions = 3;
+				switch(code){
+				case KeyEvent.VK_W: gp.ui.commandNum--; break;
+				case KeyEvent.VK_S: gp.ui.commandNum++; break;
+				case KeyEvent.VK_ENTER: 
+					switch(gp.ui.commandNum){
+					case 0:
+						gp.gameState = GamePanel.playState;
+						gp.playBGM(0);
+						break;
+					case 1:
+						gp.ui.titleWindow = 1;
+						break;
+					case 2:
+						System.exit(0);
+					}
+					break;
+				}
+				gp.ui.commandNum = (gp.ui.commandNum < 0) ? gp.ui.commandNum + maxOptions : gp.ui.commandNum % maxOptions;
+				break;
+			case 1:
+				maxOptions = 4;
+				switch(code){
+				case KeyEvent.VK_W: gp.ui.commandNum--; break;
+				case KeyEvent.VK_S: gp.ui.commandNum++; break;
+				case KeyEvent.VK_ENTER: 
+					switch(gp.ui.commandNum){
+					case 0:
+						System.out.println("You selected Baldy!");
+						break;
+					case 1:
+						System.out.println("You selected Centurion!");
+						break;
+					case 2:
+						System.out.println("You selected Scholar!");
+						break;
+					case 3:
+						gp.ui.titleWindow = 0;
+						break;
+					}
+					break;
+				}
+				gp.ui.commandNum = (gp.ui.commandNum < 0) ? gp.ui.commandNum + maxOptions : gp.ui.commandNum % maxOptions;
+				break;
+			
+			}
+		}
 		
 		if(code == KeyEvent.VK_SPACE){
 			if(gp.gameState == GamePanel.playState){
@@ -37,7 +89,7 @@ public class KeyboardInput implements KeyListener{
 		if(code == KeyEvent.VK_H){
 			if(gp.gameState == GamePanel.playState){
 				gp.gameState = GamePanel.readState;
-				
+
 			} else if(gp.gameState == GamePanel.readState){
 				gp.gameState = GamePanel.playState;
 			}

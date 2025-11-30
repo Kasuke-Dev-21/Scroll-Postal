@@ -1,6 +1,5 @@
 package main;
-
-import entity.NPC;
+import entity.StaticNPC;
 
 public class AssetSetup {
 	
@@ -15,8 +14,8 @@ public class AssetSetup {
 
 	public void setNPC(){
 
-		gp.npc[0] = new NPC(gp, 1);
-		gp.npc[0].worldX = gp.tileSize * 24;
+		gp.npc[0] = new StaticNPC(gp); 
+		gp.npc[0].worldX = gp.tileSize * 24; // Set its location
 		gp.npc[0].worldY = gp.tileSize * 7;
 	}
 }
