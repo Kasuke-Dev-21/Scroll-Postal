@@ -1,7 +1,6 @@
 package tile;
 
 import java.awt.Graphics2D;
-import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -42,7 +41,7 @@ public class TileManager {
 			case 1:
 			case 2:
 			case 4:
-				tile[x].collision = true; break;
+				collision = true; break;
 			}
 
 			setup(x, files[x], collision);

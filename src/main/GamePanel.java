@@ -9,6 +9,7 @@ import javax.swing.JPanel;
 
 
 import entity.Player;
+import entity.Entity;
 import object.Interactable;
 import tile.TileManager;
 
@@ -32,7 +33,7 @@ public class GamePanel extends JPanel implements Runnable{
 	
 	//System Setup
 	TileManager TM = new TileManager(this);
-	KeyboardInput key = new KeyboardInput();
+	KeyboardInput key = new KeyboardInput(this);
 	public CollisionCheck cd = new CollisionCheck(this); 
 	public AssetSetup AS = new AssetSetup(this);
 	public GUI ui = new GUI(this);
@@ -41,8 +42,17 @@ public class GamePanel extends JPanel implements Runnable{
 	Thread gameThread; //game clock
 	
 	//Entity and object
+	final int entityArrSize = 10;
+
 	public Player player = new Player(this, key);
-	public Interactable obj[] = new Interactable[10];
+	public Interactable obj[] = new Interactable[entityArrSize];
+	public Entity npc[] = new Entity[entityArrSize];
+
+	/* GAME STATE SETTINGS */
+	public int gameState;
+	public static final int playState = 1;
+	public static final int pauseState = 0;
+	public static final int readState = 2;
 	
 	/* WORLD SETTINGS */
 	public final int maxWorldCol = 50;
@@ -65,7 +75,9 @@ public class GamePanel extends JPanel implements Runnable{
 	public void gameLoad() {
 		
 		AS.setObject();
-		playMusic(0);
+		AS.setNPC();
+		//playMusic(0);
+		gameState = playState;
 
 	}
 	
@@ -157,9 +169,18 @@ public class GamePanel extends JPanel implements Runnable{
 	
 	public void update() {
 		
-		//Player movement logic
-		player.update();
-		
+		if(gameState == playState){
+			//Player movement logic
+			player.update();
+			//NPC movement logic
+			for(int ctr = 0; ctr < npc.length; ctr++){
+				if(npc[ctr] != null){
+					npc[ctr].update();
+				}
+			}
+		} else if(gameState == pauseState){
+			//pass;
+		}
 
 		// reset flag so it only triggers once per press
 		key.interactTyped = false;
@@ -188,6 +209,13 @@ public class GamePanel extends JPanel implements Runnable{
 			}
 		}
 		
+		//NPC
+		for(int ctr = 0; ctr < npc.length; ctr++){
+			if(npc[ctr] != null){
+				npc[ctr].draw(g2);
+			}
+		}
+
 		//Player
 		player.draw(g2);
 		

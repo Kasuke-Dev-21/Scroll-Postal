@@ -140,4 +140,108 @@ public class CollisionCheck {
 		
 		return ndx;
 	}
+
+	//ENTITY COLLISION
+	public int checkEntity(Entity e, Entity[] target){
+		int ndx = -1;
+		
+		for(int ctr = 0; ctr < target.length; ctr++) {
+			if (target[ctr] != null){
+				
+				//get hitbox positions
+				e.hitbox.x += e.worldX;
+				e.hitbox.y += e.worldY;
+				
+				target[ctr].hitbox.x += target[ctr].worldX;
+				target[ctr].hitbox.y += target[ctr].worldY;
+				
+				switch(e.direction) {
+				case("up"):
+					e.hitbox.y -= e.speed;
+					if(e.hitbox.intersects(target[ctr].hitbox)) {
+						e.collisionOn = true;
+						ndx = ctr;
+					}
+					break;
+					
+				case("down"):
+					e.hitbox.y += e.speed;
+					if(e.hitbox.intersects(target[ctr].hitbox)) {
+						e.collisionOn = true;
+						ndx = ctr;
+					}
+					break;
+					
+				case("left"):
+					e.hitbox.x -= e.speed;
+					if(e.hitbox.intersects(target[ctr].hitbox)) {
+						e.collisionOn = true;
+						ndx = ctr;
+					}
+					break;
+					
+				case("right"):
+					e.hitbox.x += e.speed;
+					if(e.hitbox.intersects(target[ctr].hitbox)) {
+						e.collisionOn = true;
+						ndx = ctr;
+					}
+					break;
+				
+				}
+				e.hitbox.x = e.hitboxDefaultX;
+				e.hitbox.y = e.hitboxDefaultY;
+				
+				target[ctr].hitbox.x = target[ctr].hitboxDefaultX;
+				target[ctr].hitbox.y = target[ctr].hitboxDefaultY;
+			}
+		}
+		
+		return ndx;
+	}
+
+	public void checkPlayer(Entity e){
+		//get hitbox positions
+		e.hitbox.x += e.worldX;
+		e.hitbox.y += e.worldY;
+		
+		gp.player.hitbox.x += gp.player.worldX;
+		gp.player.hitbox.y += gp.player.worldY;
+		
+		switch(e.direction) {
+		case("up"):
+			e.hitbox.y -= e.speed;
+			if(e.hitbox.intersects(gp.player.hitbox)) {
+				e.collisionOn = true;
+			}
+			break;
+			
+		case("down"):
+			e.hitbox.y += e.speed;
+			if(e.hitbox.intersects(gp.player.hitbox)) {
+				e.collisionOn = true;
+			}
+			break;
+			
+		case("left"):
+			e.hitbox.x -= e.speed;
+			if(e.hitbox.intersects(gp.player.hitbox)) {
+				e.collisionOn = true;
+			}
+			break;
+			
+		case("right"):
+			e.hitbox.x += e.speed;
+			if(e.hitbox.intersects(gp.player.hitbox)) {
+				e.collisionOn = true;
+			}
+			break;
+		
+		}
+		e.hitbox.x = e.hitboxDefaultX;
+		e.hitbox.y = e.hitboxDefaultY;
+		
+		gp.player.hitbox.x = gp.player.hitboxDefaultX;
+		gp.player.hitbox.y = gp.player.hitboxDefaultY;
+	}
 }

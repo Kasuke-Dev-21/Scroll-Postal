@@ -1,29 +1,28 @@
 package entity;
 
+import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
-
-import javax.imageio.ImageIO;
 
 import main.GamePanel;
 import main.KeyboardInput;
-import main.Util;
 
 public class Player extends Entity{
-
-	GamePanel gp;
 	KeyboardInput key;
 	public final int screenX;
 	public final int screenY;
-	public int hasKey = 0;
-	public boolean hasMail = false; // new field
-	public int score = 0;           // track score
+	int idleCount = 0;
+
+	public int hasMail = 0;
+	public int hasScroll = 0;
+	public int hasBox = 0;
+	public int hasBag = 0;
+	public int score = 0;
 	
 	public Player(GamePanel gp, KeyboardInput key) {
 		
-		this.gp = gp;
+		super(gp);
 		this.key = key;
 		
 		screenX = gp.screenWidth/2 - gp.tileSize/2;
@@ -53,29 +52,14 @@ public class Player extends Entity{
 	}
 	
 	public void getImage() {
-		up1 = setup("boy_up_1.png");
-		up2 = setup("boy_up_2.png");
-		down1 = setup("boy_down_1.png");
-		down2 = setup("boy_down_2.png");
-		left1 = setup("boy_left_1.png");
-		left2 = setup("boy_left_2.png");
-		right1 = setup("boy_right_1.png");
-		right2 = setup("boy_right_2.png");
-	}
-
-	public BufferedImage setup(String imagePath){
-		
-		Util tool = new Util();
-		BufferedImage image = null;
-
-		try{
-			image = ImageIO.read(getClass().getResourceAsStream("/player/" + imagePath));
-			image = tool.scaleImage(image, gp.tileSize, gp.tileSize);
-		} catch(IOException e){
-			e.printStackTrace();
-		}
-
-		return image;
+		up1 = setup("player", "boy_up_1.png");
+		up2 = setup("player","boy_up_2.png");
+		down1 = setup("player","boy_down_1.png");
+		down2 = setup("player","boy_down_2.png");
+		left1 = setup("player","boy_left_1.png");
+		left2 = setup("player","boy_left_2.png");
+		right1 = setup("player","boy_right_1.png");
+		right2 = setup("player","boy_right_2.png");
 	}
 	
 	public void update() {
@@ -100,6 +84,9 @@ public class Player extends Entity{
 			gp.cd.checkTile(this);
 			int objNdx = gp.cd.checkObject(this, true);
 			takeObject(objNdx);
+
+			int npcNdx = gp.cd.checkEntity(this, gp.npc);
+			interact(npcNdx);
 			
 			if(collisionOn == false) {
 				switch(direction) {
@@ -121,6 +108,13 @@ public class Player extends Entity{
 				}
 				spriteCounter = 0;
 			}
+		
+		} else {
+			idleCount++;
+			if(idleCount == 20){
+				spriteNum = 1;
+				idleCount = 0;
+			}
 		}
 		
 	}
@@ -132,22 +126,6 @@ public class Player extends Entity{
 			String objName = gp.obj[ndx].name;
 			
 			switch(objName) {
-			case "key":
-				gp.playSFX(2);
-				hasKey++;
-				gp.obj[ndx] = null;
-				gp.ui.showMessage("Key obtained!");
-				break;
-			case "door":
-				if(hasKey > 0) {
-					gp.playSFX(4);
-					gp.obj[ndx] = null;
-					hasKey--;
-					gp.ui.showMessage("Door opened!");
-				} else {
-					gp.ui.showMessage("Key needed!");
-				}
-				break;
 			case "boot":
 				gp.playSFX(3);
 				speed += 3;
@@ -155,11 +133,9 @@ public class Player extends Entity{
 				gp.ui.showMessage("Speed up!");
 				break;
 			case "mail":
-			    if(!hasMail){
-			        hasMail = true;
-			        gp.obj[ndx] = null;
-			        gp.ui.showMessage("Picked up mail!");
-			    }
+				hasMail++;
+				gp.obj[ndx] = null;
+				gp.ui.showMessage("Picked up mail!");
 			    break;
 			}
 		}
@@ -197,6 +173,14 @@ public class Player extends Entity{
 			break;
 		}
 		
-		g2.drawImage(image, screenX, screenY, gp.tileSize, gp.tileSize, null);
+		g2.drawImage(image, screenX, screenY, null);
+		g2.setColor(Color.red);
+		g2.drawRect(screenX + hitbox.x, screenY + hitbox.y, hitbox.width, hitbox.height);
+	}
+
+	public void interact(int ndx){
+		if(ndx != -1) {
+			
+		}
 	}
 }
