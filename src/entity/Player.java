@@ -9,19 +9,25 @@ import main.GamePanel;
 import main.KeyboardInput;
 
 public class Player extends Entity{
+	//Graphics
 	KeyboardInput key;
 	private static final String PLAYER_WALK_SHEET_PATH = "player-walk.png"; 
     private static final String PLAYER_IDLE_SHEET_PATH = "player-idle.png";
 	public final int screenX;
 	public final int screenY;
 	int idleCount = 0;
-	public String orientation = "right";
 
-	public int hasMail = 0;
-	public int hasScroll = 0;
-	public int hasBox = 0;
-	public int hasBag = 0;
+	//Inventory
+	public int mailCount = 0;
+	public int scrollCount = 0;
 	public int score = 0;
+
+	//Modifiers
+	public double scoreMult = 1.0;
+	public int multTimer = 0;
+
+	public int speedBoost = 0;
+	public int boostTimer = 0;
 	
 	public Player(GamePanel gp, KeyboardInput key) {
 		
@@ -39,6 +45,7 @@ public class Player extends Entity{
 		
 		hitboxDefaultX = hitbox.x;
 		hitboxDefaultY = hitbox.y;
+		orientation = "right";
 		
 		setDefault();
 		getImage();
@@ -48,7 +55,7 @@ public class Player extends Entity{
 	public void setDefault() {
 		
 		worldX = gp.tileSize * 23;
-		worldY = gp.tileSize * 21;
+		worldY = gp.tileSize * 37;
 		speed = 4;
 		direction = "down";
 		
@@ -132,6 +139,37 @@ public class Player extends Entity{
             }
 			super.update();
 		}
+
+        if (boostTimer > 0) {
+            boostTimer--;
+        }
+        if (boostTimer == 0 && speedBoost > 0) {
+            speed -= speedBoost;
+            speedBoost = 0;
+        }
+
+        if (multTimer > 0) {
+            multTimer--;
+        }
+        if (multTimer == 0 && scoreMult != 1.0) {
+            scoreMult = 1.0;
+        }
+        
+		if (gp.key.interactTyped) {
+			// interaction check
+			int objNdx = gp.cd.checkObject(this, true);
+			
+			if (objNdx != -1) {
+				String objName = gp.obj[objNdx].name;
+				switch (objName) {
+				case "altar":
+					gp.listener.checkEvent(gp.obj[objNdx].worldX, gp.obj[objNdx].worldY, objName);
+					break;
+				}
+			}
+
+			gp.key.interactTyped = false;
+		}
 		
 	}
 	
@@ -149,7 +187,7 @@ public class Player extends Entity{
 				gp.ui.showMessage("Speed up!");
 				break;
 			case "mail":
-				hasMail++;
+				mailCount++;
 				gp.obj[ndx] = null;
 				gp.ui.showMessage("Picked up mail!");
 			    break;

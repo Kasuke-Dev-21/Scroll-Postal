@@ -25,6 +25,7 @@ public abstract class Entity {
     public ArrayList<BufferedImage> idle = new ArrayList<>();
 	public ArrayList<BufferedImage> currentSprites = down;
 	public String direction;
+	public String orientation = "right";
 	
 	public int spriteCounter = 0;
 	// spriteIndex replaces spriteNum and will index the currentSprites list

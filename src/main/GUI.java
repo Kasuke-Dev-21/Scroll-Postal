@@ -32,11 +32,17 @@ public class GUI {
 
 	//Menu Select
 	public BufferedImage titleScreenImage;
+	public BufferedImage endScreenImage;
 	public int commandNum = 0;
 	public int titleWindow = 0;
+	
+	//Icons
+	BufferedImage scrollIcon, mailIcon;
+	int iconSize = 40;
+	int iconX;
 
 	//Timer values
-	double playTime = 600;
+	double playTime = 300;
 	DecimalFormat timeFormat = new DecimalFormat("#0");
 	
 	public GUI(GamePanel gp) {
@@ -49,6 +55,10 @@ public class GUI {
 			testType = Font.createFont(Font.TRUETYPE_FONT, is);
 
 			titleScreenImage = ImageIO.read(getClass().getResourceAsStream("/screens/title-screen.png"));
+			endScreenImage = ImageIO.read(getClass().getResourceAsStream("/screens/shift-over.png"));
+
+			scrollIcon = ImageIO.read(getClass().getResourceAsStream("/objects/scroll.png"));
+            mailIcon = ImageIO.read(getClass().getResourceAsStream("/objects/mail.png"));
 		} catch(FontFormatException e) {
 			e.printStackTrace();
 		} catch(IOException e) {
@@ -90,9 +100,14 @@ public class GUI {
 				break;
 			case GamePanel.playState:
 				//Timer
-				g2.drawString(String.valueOf(gp.player.score), gp.tileSize*2, 65);
-				g2.drawString(timeFormat.format(playTime), gp.tileSize*13, 65);
-				playTime -= (double)1/60;
+				drawPlayScreen(); // New method for cleaner code
+                playTime -= (double)1/60;
+                if (playTime <= 0) {
+                    playTime = 0;
+					gp.stopMusic();;
+					gp.playSFX(5);
+                    gp.gameState = GamePanel.endState;
+                }
 				break;
 			case GamePanel.pauseState:
 				drawPause();
@@ -100,7 +115,21 @@ public class GUI {
 			case GamePanel.readState:
 				drawHelpScreen(); // Changed to a specific method
 				break;
+			case GamePanel.endState:
+				drawEndShift();
+				break;
 		}
+		// Always draw message on top
+        if(messageOn == true) {
+            g2.setFont(g2.getFont().deriveFont(30F));
+            g2.drawString(message, gp.tileSize, gp.screenHeight - gp.tileSize);
+            
+            messageLifetime++;
+            if(messageLifetime > 120) { // Display for 2 seconds (120 frames)
+                messageLifetime = 0;
+                messageOn = false;
+            }
+        }
 
 	}
 
@@ -131,7 +160,7 @@ public class GUI {
 			g2.fillRect(0, 0, gp.screenWidth, gp.screenHeight);
 			// Character Select
 			drawTitleText("CHARACTER SELECT", 3, 96);
-			drawMenuOption("Baldy", 7, 0);
+			drawMenuOption("Jovi", 7, 0);
 			drawMenuOption("Centurion", 8, 1);
 			drawMenuOption("Scholar", 9, 2);
 			drawMenuOption("Exit", 11, 3);
@@ -139,6 +168,64 @@ public class GUI {
 		}
 		
 	}
+
+	public void drawPlayScreen() {
+        int line1Y = 65;
+        
+        // Current Score (Left)
+        g2.drawString("SCORE: " + String.valueOf(gp.player.score), gp.tileSize * 1, line1Y);
+        
+        // Time Remaining (Right)
+        String timeText = "TIME: " + timeFormat.format(playTime);
+        int timeX = rightAlignX(timeText, gp.screenWidth - gp.tileSize);
+        g2.drawString(timeText, timeX, line1Y);
+        
+		//Inventory
+		int line2Y = line1Y + 35; // Move down 30 pixels from line 1
+
+        // Scroll Icon and Count
+        iconX = gp.tileSize * 1;
+        
+        if (scrollIcon != null) {
+            g2.drawImage(scrollIcon, iconX, line2Y - 30, iconSize, iconSize, null); // Draw image
+            g2.drawString("x " + gp.player.scrollCount, iconX + 42, line2Y); // Draw count next to it
+        } else {
+            // Fallback if image fails
+            g2.drawString("Scrolls: " + gp.player.scrollCount, iconX, line2Y);
+        }
+
+        // Mail Icon and Count
+        iconX = iconX + 150;
+        
+        if (mailIcon != null) {
+            g2.drawImage(mailIcon, iconX, line2Y - 30, iconSize, iconSize, null);
+            g2.drawString("x " + gp.player.mailCount, iconX + 42, line2Y);
+        } else {
+            // Fallback if image fails
+            g2.drawString("Mail: " + gp.player.mailCount, iconX, line2Y);
+        }
+
+        // Active Modifiers (Below Score)
+        if (gp.player.scoreMult != 1.0) {
+            String multText = "MULTIPLIER: x" + String.format("%.1f", gp.player.scoreMult);
+            g2.setColor(Color.YELLOW);
+            g2.drawString(multText, gp.tileSize * 1, 95);
+            g2.setColor(Color.WHITE); // Reset color
+        }
+        if (gp.player.boostTimer > 0) {
+            String speedText = "SPEED BOOST: " + timeFormat.format((double)gp.player.boostTimer/60);
+            g2.setColor(Color.CYAN);
+            g2.drawString(speedText, gp.tileSize * 1, 125);
+            g2.setColor(Color.WHITE); // Reset color
+        }
+    }
+    
+    public int rightAlignX(String text, int rightX) {
+        int length = (int)g2.getFontMetrics().getStringBounds(text, g2).getWidth();
+        int x = rightX - length;
+        return x;
+    }
+
 	public void drawPause(){
 
 		g2.setFont(testType.deriveFont(Font.PLAIN, 80F));
@@ -236,4 +323,30 @@ public class GUI {
 		}
 	}
 
+	public void drawScore(){
+		float size = 64F;
+		g2.setFont(g2.getFont().deriveFont(Font.BOLD, size));
+		g2.setColor(Color.WHITE);
+		g2.drawString("SCORE: " + String.valueOf(gp.player.score), gp.tileSize * 1 - 24, gp.tileSize * 1);
+	}
+
+	public void drawEndShift(){
+		if (endScreenImage != null) {
+			g2.drawImage(endScreenImage, 0, 0, gp.screenWidth, gp.screenHeight, null);
+		} else {
+			// Fallback: If image fails to load, use a solid color background
+			g2.setColor(new Color(70, 120, 80));
+			g2.fillRect(0, 0, gp.screenWidth, gp.screenHeight);
+		}
+
+		g2.setColor(new Color(0, 0, 0, 50));
+		g2.fillRect(0, 0, gp.screenWidth, gp.screenHeight);
+
+		drawScore();
+		/* MENU */
+		//Start
+		drawMenuOption("REPLAY", 9, 0);
+		//Character Customization
+		drawMenuOption("RETURN", 10, 1);
+	}
 }

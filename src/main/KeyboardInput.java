@@ -25,23 +25,27 @@ public class KeyboardInput implements KeyListener{
 	public void keyPressed(KeyEvent e) {
 		
 		int code = e.getKeyCode();
+		int maxOptions;
 
 		if(gp.gameState == GamePanel.titleState){
-			int maxOptions;
 			switch(gp.ui.titleWindow){
 			case 0:
 				maxOptions = 3;
 				switch(code){
+				case KeyEvent.VK_UP:
 				case KeyEvent.VK_W: gp.ui.commandNum--; break;
+				case KeyEvent.VK_DOWN:
 				case KeyEvent.VK_S: gp.ui.commandNum++; break;
 				case KeyEvent.VK_ENTER: 
 					switch(gp.ui.commandNum){
 					case 0:
+						gp.stopMusic();
 						gp.gameState = GamePanel.playState;
 						gp.playBGM(0);
 						break;
 					case 1:
 						gp.ui.titleWindow = 1;
+						gp.ui.commandNum = 0;
 						break;
 					case 2:
 						System.exit(0);
@@ -53,12 +57,14 @@ public class KeyboardInput implements KeyListener{
 			case 1:
 				maxOptions = 4;
 				switch(code){
+				case KeyEvent.VK_UP:
 				case KeyEvent.VK_W: gp.ui.commandNum--; break;
+				case KeyEvent.VK_DOWN:
 				case KeyEvent.VK_S: gp.ui.commandNum++; break;
 				case KeyEvent.VK_ENTER: 
 					switch(gp.ui.commandNum){
 					case 0:
-						System.out.println("You selected Baldy!");
+						System.out.println("You selected Jovie!");
 						break;
 					case 1:
 						System.out.println("You selected Centurion!");
@@ -68,6 +74,7 @@ public class KeyboardInput implements KeyListener{
 						break;
 					case 3:
 						gp.ui.titleWindow = 0;
+						gp.ui.commandNum = 1;
 						break;
 					}
 					break;
@@ -76,6 +83,29 @@ public class KeyboardInput implements KeyListener{
 				break;
 			
 			}
+		} else if (gp.gameState == GamePanel.endState){
+			maxOptions = 2;
+			switch(code){
+			case KeyEvent.VK_UP:
+			case KeyEvent.VK_W: gp.ui.commandNum--; break;
+			case KeyEvent.VK_DOWN:
+			case KeyEvent.VK_S: gp.ui.commandNum++; break;
+			case KeyEvent.VK_ENTER: 
+				gp.ui.playTime = 300;
+				gp.player.score = 0;
+				switch(gp.ui.commandNum){
+				case 0:
+					gp.gameState = GamePanel.playState;
+					gp.playBGM(0);
+					break;
+				case 1:
+					gp.gameState = GamePanel.titleState;
+					gp.ui.commandNum = 0;
+					break;
+				}
+				break;
+			}
+			gp.ui.commandNum = (gp.ui.commandNum < 0) ? gp.ui.commandNum + maxOptions : gp.ui.commandNum % maxOptions;
 		}
 		
 		if(code == KeyEvent.VK_SPACE){
@@ -105,8 +135,6 @@ public class KeyboardInput implements KeyListener{
 			case KeyEvent.VK_T: checkRender = !checkRender; break;
 			}
 		}
-
-		//if(){}
 	}
 
 	@Override

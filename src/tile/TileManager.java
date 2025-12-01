@@ -18,23 +18,24 @@ public class TileManager {
 	public Tile[] tile;
 	String[] files = {"grass.png", "wall.png", "water.png", "earth.png", "tree.png", "sand.png"};
 	public int tileNo[][];
+	public int tileArraySize = 10;
 	
 	public TileManager(GamePanel gp) {
 		
 		this.gp = gp;
 		
-		tile = new Tile[10];
+		tile = new Tile[tileArraySize];
 		
 		tileNo = new int[gp.maxWorldCol][gp.maxWorldRow];
 		
-		getTileImage();
+		getTileImage(6);
 		
 		loadMap("/maps/worldmap.txt");
 		
 	}
 	
-	public void getTileImage() {
-		for(int x = 0; x < 6; x++) {
+	public void getTileImage(int fileNums) {
+		for(int x = 0; x < fileNums; x++) {
 			boolean collision = false;
 
 			switch(x) {

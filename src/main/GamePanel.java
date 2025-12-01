@@ -33,16 +33,17 @@ public class GamePanel extends JPanel implements Runnable{
 	
 	//System Setup
 	TileManager TM = new TileManager(this);
-	KeyboardInput key = new KeyboardInput(this);
+	public KeyboardInput key = new KeyboardInput(this);
 	public CollisionCheck cd = new CollisionCheck(this); 
 	public AssetSetup AS = new AssetSetup(this);
 	public GUI ui = new GUI(this);
+	public EventHandler listener = new EventHandler(this);
 	Sound bgm = new Sound();
 	Sound sfx = new Sound();
 	Thread gameThread; //game clock
 	
 	//Entity and object
-	final int entityArrSize = 10;
+	final int entityArrSize = 20;
 
 	public Player player = new Player(this, key);
 	public Interactable obj[] = new Interactable[entityArrSize];
@@ -54,6 +55,7 @@ public class GamePanel extends JPanel implements Runnable{
 	public static final int playState = 1;
 	public static final int pauseState = 2;
 	public static final int readState = 3;
+	public static final int endState = 4;
 	
 	/* WORLD SETTINGS */
 	public final int maxWorldCol = 50;
@@ -77,7 +79,7 @@ public class GamePanel extends JPanel implements Runnable{
 		
 		AS.setObject();
 		AS.setNPC();
-		//playBGM(0);
+		playBGM(6);
 		gameState = titleState;
 
 	}
@@ -121,7 +123,7 @@ public class GamePanel extends JPanel implements Runnable{
 		*			nextDrawTime += drawInterval;
 		*			
 		*		} catch (InterruptedException e) {
-		*			// TODO Auto-generated catch block
+		*
 		*			e.printStackTrace();
 		*		}
 		*	}
