@@ -42,7 +42,8 @@ public class GUI {
 	int iconX;
 
 	//Timer values
-	double playTime = 300;
+	public static final int setPlayTime = 600;
+	double playTime = 600;
 	DecimalFormat timeFormat = new DecimalFormat("#0");
 	
 	public GUI(GamePanel gp) {
@@ -228,24 +229,29 @@ public class GUI {
 
 	public void drawPause(){
 
+		g2.setColor(new Color(0, 0, 0, 150));
+        g2.fillRect(0, 0, gp.screenWidth, gp.screenHeight);
+
 		g2.setFont(testType.deriveFont(Font.PLAIN, 80F));
-
 		String text = "PAUSED";
-		
 		int x = centerTextX(text);
-		int y = gp.screenHeight/2;
+		int y = gp.tileSize * 3;
 
+		g2.setColor(Color.WHITE);
 		g2.drawString(text, x, y);
+
+		g2.setFont(pixType);
+		drawMenuOption("RESUME", 9, 0);
+		drawMenuOption("RETURN TO TITLE", 10, 1);
 	}
 
 	public void drawHelpScreen(){
-		// Coordinates for the dialogue box/help window
 		int x = gp.tileSize * 2;
 		int y = gp.tileSize / 2;
 		int width = gp.screenWidth - (gp.tileSize * 4);
 		int height = gp.tileSize * 10;
 		
-		drawDialogueWindow(x, y, width, height); // Draw the box
+		drawDialogueWindow(x, y, width, height); 
 
 		// Draw text content
 		g2.setFont(contentFont);
@@ -255,10 +261,9 @@ public class GUI {
 		int textY = y + gp.tileSize;
 		int lineHeight = (int)g2.getFontMetrics().getStringBounds("A", g2).getHeight();
 
-		// Iterate through lines of the help content and draw them
 		for(String line : helpContent.split("\n")) {
 			g2.drawString(line, textX, textY);
-			textY += lineHeight; // Move down for the next line
+			textY += lineHeight;
 		}
 	}
 

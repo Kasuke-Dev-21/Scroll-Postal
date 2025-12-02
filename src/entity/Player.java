@@ -16,6 +16,7 @@ public class Player extends Entity{
 	public final int screenX;
 	public final int screenY;
 	int idleCount = 0;
+	public BufferedImage hatImage;
 
 	//Inventory
 	public int mailCount = 0;
@@ -52,12 +53,22 @@ public class Player extends Entity{
 		
 	}
 	
+	public void setHat(String hatName) {
+        try {
+            this.hatImage = setup("player", hatName + ".png"); 
+        } catch (Exception e) {
+            System.err.println("Could not load hat image: " + hatName);
+            this.hatImage = null;
+        }
+    }
+
 	public void setDefault() {
 		
 		worldX = gp.tileSize * 23;
 		worldY = gp.tileSize * 37;
 		speed = 4;
 		direction = "down";
+		orientation = "right";
 		
 	}
 	
@@ -65,13 +76,11 @@ public class Player extends Entity{
 		String dir = "player";
 		//Idle
 		for (int i = 0; i < 8; i++) {
-            // Note: We use PLAYER_IDLE_SHEET_PATH and row 0
             BufferedImage frame = setupSheet(dir, PLAYER_IDLE_SHEET_PATH, i, 0); 
             idle.add(frame);
         }
 		//Walk
 		for (int i = 0; i < 14; i++) {
-            // Note: We use PLAYER_WALK_SHEET_PATH and row 0
             BufferedImage frame = setupSheet(dir, PLAYER_WALK_SHEET_PATH, i, 0); 
             down.add(frame);
         }
@@ -117,8 +126,6 @@ public class Player extends Entity{
 			int objNdx = gp.cd.checkObject(this, true);
 			takeObject(objNdx);
 
-			int npcNdx = gp.cd.checkEntity(this, gp.npc);
-			interact(npcNdx);
 			
 			if(collisionOn == false) {
 				switch(direction) {
@@ -134,8 +141,8 @@ public class Player extends Entity{
 		} else {
 			if (currentSprites != idle) {
                 currentSprites = idle;
-                animationSpeed = 5; // Slower animation speed for idle
-                spriteIndex = 0; // Reset animation index
+                animationSpeed = 5; 
+                spriteIndex = 0; 
             }
 			super.update();
 		}
@@ -167,6 +174,10 @@ public class Player extends Entity{
 					break;
 				}
 			}
+			int npcNdx = gp.cd.checkEntity(this, gp.npc);
+            if (npcNdx != -1) {
+                gp.listener.checkNPCInteraction(npcNdx); 
+            }
 
 			gp.key.interactTyped = false;
 		}
@@ -180,11 +191,11 @@ public class Player extends Entity{
 			String objName = gp.obj[ndx].name;
 			
 			switch(objName) {
-			case "boot":
-				gp.playSFX(3);
-				speed += 3;
+			case "scroll":
+				gp.playSFX(2);
+				scrollCount++;
 				gp.obj[ndx] = null;
-				gp.ui.showMessage("Speed up!");
+				gp.ui.showMessage("Picked up a scroll!");
 				break;
 			case "mail":
 				mailCount++;
@@ -203,13 +214,11 @@ public class Player extends Entity{
             image = currentSprites.get(spriteIndex); // Get the currently indexed frame
         }
 
-		// Define the source coordinates (the whole image)
         int sourceX1 = 0;
         int sourceY1 = 0;
         int sourceX2 = gp.tileSize;
         int sourceY2 = gp.tileSize;
         
-        // Define the destination coordinates (screen location and size)
         int destX1 = screenX;
         int destY1 = screenY;
         int destX2 = screenX + gp.tileSize;
@@ -223,17 +232,18 @@ public class Player extends Entity{
             g2.drawImage(image, destX1, destY1, destX2, destY2, sourceX1, sourceY1, sourceX2, sourceY2, null);
         }
 
+		if (orientation.equals("left")) {
+            destX1 = screenX + gp.tileSize + 4;
+            destX2 = screenX - 10;
+        }
+		if (hatImage != null) {
+            g2.drawImage(hatImage, destX1 - 2, destY1 - 16, destX2 + 6, destY2 - 12, sourceX1, sourceY1, sourceX2, sourceY2, null);
+        }
+
 		if(key.checkRender == true){
 			g2.setColor(Color.red);
 			g2.drawRect(screenX + hitbox.x, screenY + hitbox.y, hitbox.width, hitbox.height);
 		}
 	}
 
-
-
-	public void interact(int ndx){
-		if(ndx != -1) {
-			
-		}
-	}
 }

@@ -11,7 +11,8 @@ public class NPC extends Entity{
     private static final String NPC_WALK_SHEET_PATH = "npc-walk.png"; 
     private static final String NPC_IDLE_SHEET_PATH = "npc-idle.png";
 
-    public boolean isMoving = false; 
+    public boolean isMoving = false;
+    public boolean canGiveScroll = true;
 
     public NPC(GamePanel gp, int spd){
         super(gp);
@@ -71,11 +72,11 @@ public class NPC extends Entity{
             if (isMoving) {
                 // Moving State
                 currentSprites = down;
-                animationSpeed = 12; 
+                animationSpeed = 5; 
             } else {
                 // Idle State
                 currentSprites = idle;
-                animationSpeed = 30; 
+                animationSpeed = 15; 
             }
 
             spriteIndex = 0; // Reset animation index
@@ -85,15 +86,12 @@ public class NPC extends Entity{
 
     public void update() {
         
-        setAction();
-        String newDirection = direction;
-        
+        setAction();        
         if (isMoving) {
             collisionOn = false;
             gp.cd.checkTile(this);
             gp.cd.checkObject(this, false); 
             gp.cd.checkEntity(this, gp.npc); 
-            gp.cd.checkPlayer(this);
             
             // collision check
             if(collisionOn == false) {

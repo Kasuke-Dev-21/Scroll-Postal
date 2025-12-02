@@ -4,17 +4,21 @@ import main.GamePanel;
 import java.awt.image.BufferedImage;
 
 public class StaticNPC extends Entity{
+
+    public String name;
     
     // Define the file path for your single spritesheet
     private static final int FRAME_COUNT = 2;
 
-    public StaticNPC(GamePanel gp){
+    public StaticNPC(GamePanel gp, String name){
         super(gp);
 
+        this.name = name;
         direction = "down"; 
         speed = 0;
         
-        getImage("fisher.png");
+
+        getImage(name + ".png");
         currentSprites = idle;
         animationSpeed = 30;
     }

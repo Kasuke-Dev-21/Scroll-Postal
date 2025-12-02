@@ -41,7 +41,6 @@ public abstract class Entity {
 		this.gp = gp;
 	}
 
-	// --- EXISTING SETUP METHOD (for single images) ---
 	public BufferedImage setup(String dir, String imagePath){
 		
 		Util tool = new Util();
@@ -64,17 +63,13 @@ public abstract class Entity {
 		BufferedImage image = null;
 
 		try{
-			// Load the entire spritesheet
 			sheet = ImageIO.read(getClass().getResourceAsStream("/" + dir + "/" + sheetPath));
 			
 			int originalTileSize = gp.originalTileSize;
 			int x = col * originalTileSize;
 			int y = row * originalTileSize;
 
-			// Cut the sub-image (32x32 area)
-			image = sheet.getSubimage(x, y, originalTileSize, originalTileSize);
-			
-			// Scale the cut image
+			image = sheet.getSubimage(x, y, originalTileSize, originalTileSize);			
 			image = tool.scaleImage(image, gp.tileSize, gp.tileSize);
 			
 		} catch(IOException e){
@@ -93,6 +88,11 @@ public abstract class Entity {
 
 		// Only run movement/collision logic if the entity is capable of moving
 		if (speed > 0) { 
+			switch(direction){
+			case "left": orientation = "left"; break;
+			case "right": orientation = "right"; break;
+			}
+
 			collisionOn = false;
 			gp.cd.checkTile(this);
 			gp.cd.checkObject(this, false);
@@ -134,9 +134,33 @@ public abstract class Entity {
 			} else {
 				image = null;
 			}
+            
+            // --- NEW: Image Flipping Logic ---
+            if (image != null) {
+                
+                // Define the source coordinates (the whole image, not cropped)
+                int sourceX1 = 0;
+                int sourceY1 = 0;
+                int sourceX2 = gp.tileSize;
+                int sourceY2 = gp.tileSize;
+                
+                // Define the destination coordinates (screen location and size)
+                int destX1 = screenX;
+                int destY1 = screenY;
+                int destX2 = screenX + gp.tileSize;
+                int destY2 = screenY + gp.tileSize;
 
-			g2.drawImage(image, screenX, screenY, gp.tileSize, gp.tileSize, null);
+                // Flip the image by swapping destination X coordinates if facing left
+                if (orientation.equals("left")) {
+                    // This flips the image horizontally
+                    destX1 = screenX + gp.tileSize; 
+                    destX2 = screenX;
+                }
+                
+                // Draw the image using the flipped coordinates if necessary
+                g2.drawImage(image, destX1, destY1, destX2, destY2, 
+                                     sourceX1, sourceY1, sourceX2, sourceY2, null);
+            }
 		}
-		
 	}
 }
